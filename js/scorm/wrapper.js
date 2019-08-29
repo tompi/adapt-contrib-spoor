@@ -140,7 +140,7 @@ define (function(require) {
             type: "success"
         }, function() {
             // This will be triggered once user presses ok
-            window.location.replace("https://cprcertificate-staging.azurewebsites.net/Tokyo2020/               FinishedElearning");
+            window.location.replace("https://cprcertificate-staging.azurewebsites.net/Tokyo2020/FinishedElearning");
         });
 
 		if(this.commitOnStatusChange) this.commit();
