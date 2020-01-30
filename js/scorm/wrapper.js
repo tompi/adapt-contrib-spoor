@@ -138,6 +138,17 @@ define ([
     else {
       this.setValue("cmi.core.lesson_status", "passed");
     }
+    // Passed, so show a message and an ok button that takes you to completion URL
+    swal({
+      title: "Congratulations!!!",
+      text: "You have now completed this e-learning. Click the ok button to finalise completion. ",
+      icon: "success",
+      button: "Send e-learning as completed",
+      type: "success"
+    }).then(function() {
+      // This will be triggered once user presses ok
+      window.location.replace("https://cprcertificate-staging.azurewebsites.net/Tokyo2020/FinishedElearning");
+    });
 
     if (this.commitOnStatusChange) this.commit();
   };
