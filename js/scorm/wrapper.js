@@ -138,7 +138,13 @@ define ([
     else {
       this.setValue("cmi.core.lesson_status", "passed");
     }
-    // Passed, so show a message and an ok button that takes you to completion URL
+    // Passed, so log to google, show a message and an ok button that takes you to completion URL
+    ga('send', {
+      hitType: 'event',
+      eventCategory: 'ELearning',
+      eventAction: 'Completed',
+      eventLabel: 'Korea Heros standard'
+    });
     swal({
       title: "Congratulations!!!",
       text: "You have now completed this e-learning. Click the ok button to finalise completion. ",
