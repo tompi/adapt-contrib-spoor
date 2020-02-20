@@ -139,12 +139,6 @@ define ([
       this.setValue("cmi.core.lesson_status", "passed");
     }
     // Passed, so log to google, show a message and an ok button that takes you to completion URL
-    ga('send', {
-      hitType: 'event',
-      eventCategory: 'ELearning',
-      eventAction: 'Completed',
-      eventLabel: 'Korea Heros standard'
-    });
     swal({
       title: "Congratulations!!!",
       text: "You have now completed this e-learning. Click the ok button to finalise completion. ",
@@ -153,6 +147,12 @@ define ([
       type: "success"
     }).then(function() {
       // This will be triggered once user presses ok
+      ga('send', {
+        hitType: 'event',
+        eventCategory: 'ELearning',
+        eventAction: 'Completed',
+        eventLabel: 'Korea Heros standard'
+      });
       window.location.replace("https://cprcertificate-staging.azurewebsites.net/Tokyo2020/FinishedElearning");
     });
 
