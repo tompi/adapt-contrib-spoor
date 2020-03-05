@@ -2,9 +2,26 @@ define ([
     'libraries/SCORM_API_wrapper'
 ], function(pipwerks) {
 
+    // Borrowed from:
+    // https://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
+    // Please return after use
+    var getParams = function(query) {
+        if (!query) {
+            return {};
+        }
+
+        return (/^[?#]/.test(query) ? query.slice(1) : query)
+            .split('&')
+            .reduce((params, param) => {
+                let [key, value] = param.split('=');
+                params[key] = value ? decodeURIComponent(value.replace(/\+/g, ' ')) : '';
+                return params;
+            }, {});
+    };
+
     /*
         IMPORTANT: This wrapper uses the Pipwerks SCORM wrapper and should therefore support both SCORM 1.2 and 2004. Ensure any changes support both versions.
-    */
+        */
 
     var ScormWrapper = function() {
         /* configuration */
@@ -112,8 +129,8 @@ define ([
     };
 
     /**
-    * allows you to check if this is the user's first ever 'session' of a SCO, even after the lesson_status has been set to 'incomplete'
-    */
+     * allows you to check if this is the user's first ever 'session' of a SCO, even after the lesson_status has been set to 'incomplete'
+     */
     ScormWrapper.prototype.isFirstSession = function() {
         return (this.getValue(this.isSCORM2004() ? "cmi.entry" :"cmi.core.entry") === "ab-initio");
     };
@@ -180,16 +197,16 @@ define ([
         switch (status.toLowerCase()){
             case "incomplete":
                 this.setIncomplete();
-            break;
+                break;
             case "completed":
                 this.setCompleted();
-            break;
+                break;
             case "passed":
                 this.setPassed();
-            break;
+                break;
             case "failed":
                 this.setFailed();
-            break;
+                break;
             default:
                 this.handleError("ScormWrapper::setStatus: the status '" + status + "' is not supported.");
         }
@@ -404,9 +421,9 @@ define ([
 
             if (!_success) {
                 /*
-                * Some LMSes have an annoying tendency to return false from a set call even when it actually worked fine.
-                * So, we should throw an error _only_ if there was a valid error code...
-                */
+                 * Some LMSes have an annoying tendency to return false from a set call even when it actually worked fine.
+                 * So, we should throw an error _only_ if there was a valid error code...
+                 */
                 if(_errorCode !== 0) {
                     _errorMsg += "Course could not set " + _property + " to " + _value;
                     _errorMsg += "\nError Info: " + this.scorm.debug.getInfo(_errorCode);
@@ -427,10 +444,10 @@ define ([
     };
 
     /**
-    * used for checking any data field that is not 'LMS Mandatory' to see whether the LMS we're running on supports it or not.
-    * Note that the way this check is being performed means it wouldn't work for any element that is
-    * 'write only', but so far we've not had a requirement to check for any optional elements that are.
-    */
+     * used for checking any data field that is not 'LMS Mandatory' to see whether the LMS we're running on supports it or not.
+     * Note that the way this check is being performed means it wouldn't work for any element that is
+     * 'write only', but so far we've not had a requirement to check for any optional elements that are.
+     */
     ScormWrapper.prototype.isSupported = function(_property) {
         this.logger.debug("ScormWrapper::isSupported: _property=" + _property);
 
@@ -608,10 +625,10 @@ define ([
     };
 
     /**
-    * Converts milliseconds into the SCORM 2004 data type 'timeinterval (second, 10,2)'
-    * this will output something like 'P1DT3H5M0S' which indicates a period of time of 1 day, 3 hours and 5 minutes
-    * or 'PT2M10.1S' which indicates a period of time of 2 minutes and 10.1 seconds
-    */
+     * Converts milliseconds into the SCORM 2004 data type 'timeinterval (second, 10,2)'
+     * this will output something like 'P1DT3H5M0S' which indicates a period of time of 1 day, 3 hours and 5 minutes
+     * or 'PT2M10.1S' which indicates a period of time of 2 minutes and 10.1 seconds
+     */
     ScormWrapper.prototype.convertToSCORM2004Time = function(msConvert) {
         var csConvert = Math.floor(msConvert / 10);
         var csPerSec = 100;
@@ -657,8 +674,8 @@ define ([
     };
 
     /**
-    * returns the current date & time in the format YYYY-MM-DDTHH:mm:ss
-    */
+     * returns the current date & time in the format YYYY-MM-DDTHH:mm:ss
+     */
     ScormWrapper.prototype.getISO8601Timestamp = function() {
         var date = new Date().toISOString();
         return date.replace(/.\d\d\dZ/, "");//Date.toISOString returns the date in the format YYYY-MM-DDTHH:mm:ss.sssZ so we need to drop the last bit to make it SCORM 2004 conformant
@@ -682,9 +699,9 @@ define ([
     };
 
     /*
-    * SCORM 1.2 requires that the identifiers in cmi.interactions.n.student_response for choice and matching activities be a character from [0-9a-z].
-    * When numeric identifiers are used this function attempts to map identifiers 10 to 35 to [a-z]. Resolves issues/1376.
-    */
+     * SCORM 1.2 requires that the identifiers in cmi.interactions.n.student_response for choice and matching activities be a character from [0-9a-z].
+     * When numeric identifiers are used this function attempts to map identifiers 10 to 35 to [a-z]. Resolves issues/1376.
+     */
     ScormWrapper.prototype.checkResponse = function(response, responseType) {
         if (!response) return response;
         if (responseType != 'choice' && responseType != 'matching') return response;
