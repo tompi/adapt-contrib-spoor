@@ -19,11 +19,35 @@ define ([
             }, {});
     };
 
+    // Stolen from MDN:
+    async function customLog(logstring) {
+        // Default options are marked with *
+        const response = await fetch('https://cprcertificate-staging.azurewebsites.net/api/Tokyo2020/qualifications/add/9999999',
+            //"https://cprcertificate-staging.azurewebsites.net/api/Tokyo2020/qualifications/add/9999999",
+            {
+            method: 'POST', // *GET, POST, PUT, DELETE, etc.
+            mode: 'cors', // no-cors, *cors, same-origin
+            cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+            credentials: 'same-origin', // include, *same-origin, omit
+            headers: {
+                'Content-Type': 'application/json'
+                // 'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            redirect: 'follow', // manual, *follow, error
+            referrerPolicy: 'no-referrer', // no-referrer, *client
+            body: JSON.stringify([logstring]) // body data type must match "Content-Type" header
+        });
+        return await response.json(); // parses JSON response into native JavaScript objects
+    }
+
+
     /*
         IMPORTANT: This wrapper uses the Pipwerks SCORM wrapper and should therefore support both SCORM 1.2 and 2004. Ensure any changes support both versions.
         */
 
     var ScormWrapper = function() {
+        /* CPR Classroom session id */
+        this.cprClassroomSessionId = getParams(window.location.search)["cprid"];
         /* configuration */
         this.setCompletedWhenFailed = true;// this only applies to SCORM 2004
         /**
@@ -116,6 +140,11 @@ define ([
         this.logger.debug("ScormWrapper::initialize");
         this.lmsConnected = this.scorm.init();
 
+        this.logger.debug("ScormWrapper::parsedClassRoomSessionId: " + this.cprClassroomSessionId);
+
+        // Log the start
+        customLog("started: " + this.cprClassroomSessionId);
+
         if (this.lmsConnected) {
             this.startTime = new Date();
 
@@ -155,6 +184,9 @@ define ([
         else {
             this.setValue("cmi.core.lesson_status", "passed");
         }
+
+        // Log the completion
+        customLog("passed: " + this.cprClassroomSessionId);
 
         if(this.commitOnStatusChange) this.commit();
     };
